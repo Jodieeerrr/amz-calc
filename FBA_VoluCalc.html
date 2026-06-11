@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>亚马逊包装尺寸测算系统</title>
+    <style>
+        :root {
+            --primary-color: #003a8c;
+            --primary-light: #e6f7ff;
+            --accent-color: #1890ff;
+            --success-color: #52c41a;
+            --warning-color: #faad14;
+            --danger-color: #ff4d4f;
+            --text-main: #262626;
+            --bg-main: #f0f2f5;
+            --border-color: #d9d9d9;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1650px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-size: 24px;
+            margin-bottom: 5px;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+        }
+
+        p.subtitle {
+            color: #666;
+            font-size: 14px;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        .config-bar {
+            background: var(--primary-light);
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid #91d5ff;
+        }
+
+        .config-left {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .info-tag {
+            font-weight: bold;
+            color: var(--primary-color);
+            background: #ffffff;
+            padding: 6px 12px;
+            border-radius: 4px;
+            border: 1px solid #b7eb8f;
+            font-size: 13px;
+            width: fit-content;
+        }
+
+        /* 风险缓冲常数控制区样式 */
+        .buffer-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 14px;
+            color: #262626;
+            font-weight: 500;
+        }
+
+        .buffer-controls input {
+            width: 65px;
+            padding: 4px 6px;
+            border: 1px solid var(--accent-color);
+            border-radius: 4px;
+            text-align: center;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .tab-box {
+            display: flex;
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 20px;
+            gap: 5px;
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            background: #fafafa;
+            border: 1px solid var(--border-color);
+            border-bottom: none;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: bold;
+            color: #595959;
+            border-top-left-radius: 4px;
+            border-top-right-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        .tab-btn:hover {
+            color: var(--accent-color);
+            background: #fff;
+        }
+
+        .tab-btn.active {
+            background: #ffffff;
+            color: var(--primary-color);
+            border-top: 3px solid var(--primary-color);
+            border-bottom: 2px solid #ffffff;
+            margin-bottom: -2px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .btn-calc { 
+            background: #2EB5C7; 
+            color: white; 
+            font-size: 16px; 
+            padding: 15px 32px; 
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .btn-calc:hover { background: #34CEE3; }
+
+        .btn-add {
+            background: var(--accent-color);
+            color: white;
+            font-size: 14px;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+        .btn-add:hover { background: #40a9ff; }
+
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 13px;
+            min-width: 1550px;
+        }
+
+        th {
+            background-color: #fafafa;
+            color: #262626;
+            font-weight: bold;
+            padding: 12px 8px;
+            border-bottom: 2px solid var(--border-color);
+            border-right: 1px solid #f0f0f0;
+        }
+
+        td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #f0f0f0;
+            border-right: 1px solid #f0f0f0;
+        }
+
+        tr:hover { background-color: #fbfbfb; }
+
+        .table-input {
+            width: 95%;
+            padding: 6px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 13px;
+        }
+
+        .dim-group {
+            display: flex;
+            gap: 4px;
+        }
+        .dim-group input { width: 32%; text-align: center; padding: 6px 2px; border: 1px solid var(--border-color); border-radius: 4px; }
+
+        .table-select {
+            width: 100%;
+            padding: 6px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+        }
+
+        .calc-cell { background-color: #fafafa; color: #555; text-align: center; font-weight: 500; }
+        .highlight-val { font-weight: bold; color: #000; background-color: #f6ffed; text-align: center; }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            text-align: center;
+        }
+        .badge-small-std { background-color: #e6f7ff; color: #1890ff; border: 1px solid #91d5ff; }
+        .badge-large-std { background-color: #f6ffed; color: #52c41a; border: 1px solid #b7eb8f; }
+        .badge-risk { background-color: #fffbe6; color: #faad14; border: 1px solid #ffe58f; }
+        .badge-oversize { background-color: #fff1f0; color: #ff4d4f; border: 1px solid #ffa39e; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>亚马逊包装尺寸测算系统</h1>
+    <p class="subtitle">单品和外箱测算都可以添加新商品，尺寸和重量的误差常数可以自由调节</p>
+
+    <div class="config-bar">
+        <div class="config-left">
+            <div class="info-tag">📌 基本规则：体积重分母 = 1:6000 | 外箱单边绝对上限 = 63.5cm | 外箱单箱绝对重量 = 22.67kg</div>
+            <div class="buffer-controls">
+                <span>⚙️ 测量误差常数调节：</span>
+                <span>📏 长度/尺寸安全缓冲：<input type="number" step="0.1" id="cfg_len_buffer" value="1.5"> cm</span>
+                <span>⚖️ 外箱重量安全缓冲：<input type="number" step="0.05" id="cfg_wt_buffer" value="0.50"> kg</span>
+            </div>
+        </div>
+        <button class="btn-calc" onclick="doGlobalCalculate()"> 点击计算</button>
+    </div>
+
+    <div class="tab-box">
+        <button id="tab-btn-item" class="tab-btn active" onclick="switchTab('item')">单品尺寸分级与 FBA 费用计算</button>
+        <button id="tab-btn-box" class="tab-btn" onclick="switchTab('box')">外箱合规测试以及效益计算</button>
+    </div>
+
+    <div id="tab-content-item" class="tab-content active">
+        <button class="btn-add" onclick="addNewItemRow()">➕ 添加新商品行</button>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 140px;">商品名称</th>
+                        <th style="width: 180px;">输入包装尺寸 (长×宽×高 cm)</th>
+                        <th style="width: 80px;">商品实重 (kg)</th>
+                        <th style="width: 80px;">预估售价 ($)</th>
+                        <th style="width: 120px;" class="calc-cell">转换英寸单位 (in)</th>
+                        <th style="width: 90px;" class="calc-cell">围长+最长边</th>
+                        <th style="width: 80px;" class="calc-cell">实重 (lbs)</th>
+                        <th style="width: 80px;" class="calc-cell">FBA体积重</th>
+                        <th style="width: 90px;" class="highlight-val">发货计费重 (lbs)</th>
+                        <th style="width: 180px;">2026 尺寸分段判定 (含动态常数警示)</th>
+                        <th style="width: 90px;" class="calc-cell">2026 FBA 基础费</th>
+                        <th style="width: 80px;" class="calc-cell">3.5% 附加费</th>
+                        <th style="width: 100px;" class="highlight-val">FBA 尾程总计</th>
+                        <th style="width: 130px;" class="calc-cell">月仓储费估算 (淡季/旺季)</th>
+                    </tr>
+                </thead>
+                <tbody id="item-table-body">
+                    <tr id="row_item1">
+                        <td><input type="text" id="item1_name" value="切丝器" class="table-input"></td>
+                        <td>
+                            <div class="dim-group">
+                                <input type="number" step="0.1" id="item1_l" value="25.0">
+                                <input type="number" step="0.1" id="item1_w" value="18.0">
+                                <input type="number" step="0.1" id="item1_h" value="12.0">
+                            </div>
+                        </td>
+                        <td><input type="number" step="0.01" id="item1_wt" value="0.85" class="table-input"></td>
+                        <td><input type="number" step="0.01" id="item1_price" value="14.99" class="table-input"></td>
+                        <td class="calc-cell" id="item1_out_in">—</td>
+                        <td class="calc-cell" id="item1_out_girth">—</td>
+                        <td class="calc-cell" id="item1_out_wtlbs">—</td>
+                        <td class="calc-cell" id="item1_out_volwt">—</td>
+                        <td class="highlight-val" id="item1_out_billwt">—</td>
+                        <td style="text-align: center;"><span id="item1_out_tier" class="badge badge-small-std">未测算</span></td>
+                        <td class="calc-cell" id="item1_out_base">—</td>
+                        <td class="calc-cell" id="item1_out_fuel">—</td>
+                        <td class="highlight-val" id="item1_out_total">—</td>
+                        <td class="calc-cell" id="item1_out_store">—</td>
+                    </tr>
+                    <tr id="row_item2">
+                        <td><input type="text" id="item2_name" value="冰激凌桶" class="table-input"></td>
+                        <td>
+                            <div class="dim-group">
+                                <input type="number" step="0.1" id="item2_l" value="45.0">
+                                <input type="number" step="0.1" id="item2_w" value="35.0">
+                                <input type="number" step="0.1" id="item2_h" value="19.5">
+                            </div>
+                        </td>
+                        <td><input type="number" step="0.01" id="item2_wt" value="2.10" class="table-input"></td>
+                        <td><input type="number" step="0.01" id="item2_price" value="24.99" class="table-input"></td>
+                        <td class="calc-cell" id="item2_out_in">—</td>
+                        <td class="calc-cell" id="item2_out_girth">—</td>
+                        <td class="calc-cell" id="item2_out_wtlbs">—</td>
+                        <td class="calc-cell" id="item2_out_volwt">—</td>
+                        <td class="highlight-val" id="item2_out_billwt">—</td>
+                        <td style="text-align: center;"><span id="item2_out_tier" class="badge badge-small-std">未测算</span></td>
+                        <td class="calc-cell" id="item2_out_base">—</td>
+                        <td class="calc-cell" id="item2_out_fuel">—</td>
+                        <td class="highlight-val" id="item2_out_total">—</td>
+                        <td class="calc-cell" id="item2_out_store">—</td>
+                    </tr>
+                    <tr id="row_item3">
+                        <td><input type="text" id="item3_name" value="270厨师机" class="table-input"></td>
+                        <td>
+                            <div class="dim-group">
+                                <input type="number" step="0.1" id="item3_l" value="15.0">
+                                <input type="number" step="0.1" id="item3_w" value="11.0">
+                                <input type="number" step="0.1" id="item3_h" value="0.5">
+                            </div>
+                        </td>
+                        <td><input type="number" step="0.01" id="item3_wt" value="0.15" class="table-input"></td>
+                        <td><input type="number" step="0.01" id="item3_price" value="8.99" class="table-input"></td>
+                        <td class="calc-cell" id="item3_out_in">—</td>
+                        <td class="calc-cell" id="item3_out_girth">—</td>
+                        <td class="calc-cell" id="item3_out_wtlbs">—</td>
+                        <td class="calc-cell" id="item3_out_volwt">—</td>
+                        <td class="highlight-val" id="item3_out_billwt">—</td>
+                        <td style="text-align: center;"><span id="item3_out_tier" class="badge badge-small-std">未测算</span></td>
+                        <td class="calc-cell" id="item3_out_base">—</td>
+                        <td class="calc-cell" id="item3_out_fuel">—</td>
+                        <td class="highlight-val" id="item3_out_total">—</td>
+                        <td class="calc-cell" id="item3_out_store">—</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="tab-content-box" class="tab-content">
+        <button class="btn-add" onclick="addNewBoxRow()">➕ 添加新商品行</button>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 130px;">外箱货件名称</th>
+                        <th style="width: 170px;">外箱长×宽×高 (cm)</th>
+                        <th style="width: 80px;">空箱重量 (kg)</th>
+                        <th style="width: 210px;">对应第一部分关联单品</th>
+                        <th style="width: 80px;">单箱量 (pcs)</th>
+                        <th style="width: 160px;">外箱风控合规检查状态</th>
+                        <th style="width: 100px;" class="calc-cell">货件总实重 (kg)</th>
+                        <th style="width: 90px;" class="calc-cell">外箱体积 (m³)</th>
+                        <th style="width: 100px;" class="calc-cell">外箱体积重 (kg)</th>
+                        <th style="width: 110px;" class="highlight-val">头程计费重 (kg)</th>
+                        <th style="width: 90px;">头程单价 (/kg)</th>
+                        <th style="width: 100px;" class="calc-cell">单箱头程总费</th>
+                        <th style="width: 110px;" class="highlight-val">单件分摊头程费</th>
+                    </tr>
+                </thead>
+                <tbody id="box-table-body">
+                    <tr id="row_box1">
+                        <td><input type="text" id="box1_name" value="切丝器" class="table-input"></td>
+                        <td>
+                            <div class="dim-group">
+                                <input type="number" step="0.1" id="box1_l" value="60.0">
+                                <input type="number" step="0.1" id="box1_w" value="40.0">
+                                <input type="number" step="0.1" id="box1_h" value="40.0">
+                            </div>
+                        </td>
+                        <td><input type="number" step="0.1" id="box1_emp" value="1.2" class="table-input"></td>
+                        <td><select id="box1_match" class="table-select"><option value="1">关联商品1</option></select></td>
+                        <td><input type="number" id="box1_pcs" value="24" class="table-input"></td>
+                        <td style="text-align: center;"><span id="box1_out_status" class="badge badge-small-std">未测算</span></td>
+                        <td class="calc-cell" id="box1_out_actwt">—</td>
+                        <td class="calc-cell" id="box1_out_m3">—</td>
+                        <td class="calc-cell" id="box1_out_volwt">—</td>
+                        <td class="highlight-val" id="box1_out_billwt">—</td>
+                        <td><input type="number" step="0.1" id="box1_rate" value="12.0" class="table-input"></td>
+                        <td class="calc-cell" id="box1_out_totalfee">—</td>
+                        <td class="highlight-val" id="box1_out_unitfee">—</td>
+                    </tr>
+                    <tr id="row_box2">
+                        <td><input type="text" id="box2_name" value="冰激凌桶" class="table-input"></td>
+                        <td>
+                            <div class="dim-group">
+                                <input type="number" step="0.1" id="box2_l" value="48.0">
+                                <input type="number" step="0.1" id="box2_w" value="38.0">
+                                <input type="number" step="0.1" id="box2_h" value="42.0">
+                            </div>
+                        </td>
+                        <td><input type="number" step="0.1" id="box2_emp" value="1.5" class="table-input"></td>
+                        <td><select id="box2_match" class="table-select"><option value="2">关联商品2</option></select></td>
+                        <td><input type="number" id="box2_pcs" value="8" class="table-input"></td>
+                        <td style="text-align: center;"><span id="box2_out_status" class="badge badge-small-std">未测算</span></td>
+                        <td class="calc-cell" id="box2_out_actwt">—</td>
+                        <td class="calc-cell" id="box2_out_m3">—</td>
+                        <td class="calc-cell" id="box2_out_volwt">—</td>
+                        <td class="highlight-val" id="box2_out_billwt">—</td>
+                        <td><input type="number" step="0.1" id="box2_rate" value="12.0" class="table-input"></td>
+                        <td class="calc-cell" id="box2_out_totalfee">—</td>
+                        <td class="highlight-val" id="box2_out_unitfee">—</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    var activeItemIds = [1, 2, 3];
+    var maxItemId = 3;
+    var activeBoxIds = [1, 2];
+    var maxBoxId = 2;
+
+    function switchTab(target) {
+        var itemContent = document.getElementById('tab-content-item');
+        var boxContent = document.getElementById('tab-content-box');
+        var itemBtn = document.getElementById('tab-btn-item');
+        var boxBtn = document.getElementById('tab-btn-box');
+
+        if (target === 'item') {
+            itemContent.style.display = 'block';
+            boxContent.style.display = 'none';
+            itemBtn.className = 'tab-btn active';
+            boxBtn.className = 'tab-btn';
+        } else {
+            itemContent.style.display = 'none';
+            boxContent.style.display = 'block';
+            itemBtn.className = 'tab-btn';
+            boxBtn.className = 'tab-btn';
+        }
+    }
+
+    function addNewItemRow() {
+        maxItemId++;
+        var currentId = maxItemId;
+        activeItemIds.push(currentId);
+
+        var tbody = document.getElementById('item-table-body');
+        var newTr = document.createElement('tr');
+        newTr.id = "row_item" + currentId;
+
+        newTr.innerHTML = '<td><input type="text" id="item' + currentId + '_name" value="自填商品' + currentId + '" class="table-input"></td>' +
+            '<td><div class="dim-group">' +
+            '<input type="number" step="0.1" id="item' + currentId + '_l" value="20.0">' +
+            '<input type="number" step="0.1" id="item' + currentId + '_w" value="15.0">' +
+            '<input type="number" step="0.1" id="item' + currentId + '_h" value="5.0">' +
+            '</div></td>' +
+            '<td><input type="number" step="0.01" id="item' + currentId + '_wt" value="0.5" class="table-input"></td>' +
+            '<td><input type="number" step="0.01" id="item' + currentId + '_price" value="10.00" class="table-input"></td>' +
+            '<td class="calc-cell" id="item' + currentId + '_out_in">—</td>' +
+            '<td class="calc-cell" id="item' + currentId + '_out_girth">—</td>' +
+            '<td class="calc-cell" id="item' + currentId + '_out_wtlbs">—</td>' +
+            '<td class="calc-cell" id="item' + currentId + '_out_volwt">—</td>' +
+            '<td class="highlight-val" id="item' + currentId + '_out_billwt">—</td>' +
+            '<td style="text-align: center;"><span id="item' + currentId + '_out_tier" class="badge badge-small-std">未测算</span></td>' +
+            '<td class="calc-cell" id="item' + currentId + '_out_base">—</td>' +
+            '<td class="calc-cell" id="item' + currentId + '_out_fuel">—</td>' +
+            '<td class="highlight-val" id="item' + currentId + '_out_total">—</td>' +
+            '<td class="calc-cell" id="item' + currentId + '_out_store">—</td>';
+
+        tbody.appendChild(newTr);
+        syncAllBoxDropdowns();
+    }
+
+    function addNewBoxRow() {
+        maxBoxId++;
+        var currentId = maxBoxId;
+        activeBoxIds.push(currentId);
+
+        var tbody = document.getElementById('box-table-body');
+        var newTr = document.createElement('tr');
+        newTr.id = "row_box" + currentId;
+
+        newTr.innerHTML = '<td><input type="text" id="box' + currentId + '_name" value="新外箱货件' + currentId + '" class="table-input"></td>' +
+            '<td><div class="dim-group">' +
+            '<input type="number" step="0.1" id="box' + currentId + '_l" value="50.0">' +
+            '<input type="number" step="0.1" id="box' + currentId + '_w" value="40.0">' +
+            '<input type="number" step="0.1" id="box' + currentId + '_h" value="30.0">' +
+            '</div></td>' +
+            '<td><input type="number" step="0.1" id="box' + currentId + '_emp" value="1.0" class="table-input"></td>' +
+            '<td><select id="box' + currentId + '_match" class="table-select"></select></td>' +
+            '<td><input type="number" id="box' + currentId + '_pcs" value="10" class="table-input"></td>' +
+            '<td style="text-align: center;"><span id="box' + currentId + '_out_status" class="badge badge-small-std">未测算</span></td>' +
+            '<td class="calc-cell" id="box' + currentId + '_out_actwt">—</td>' +
+            '<td class="calc-cell" id="box' + currentId + '_out_m3">—</td>' +
+            '<td class="calc-cell" id="box' + currentId + '_out_volwt">—</td>' +
+            '<td class="highlight-val" id="box' + currentId + '_out_billwt">—</td>' +
+            '<td><input type="number" step="0.1" id="box' + currentId + '_rate" value="12.0" class="table-input"></td>' +
+            '<td class="calc-cell" id="box' + currentId + '_out_totalfee">—</td>' +
+            '<td class="highlight-val" id="box' + currentId + '_out_unitfee">—</td>';
+
+        tbody.appendChild(newTr);
+        syncAllBoxDropdowns();
+    }
+
+    function syncAllBoxDropdowns() {
+        activeBoxIds.forEach(function(boxId) {
+            var selectEl = document.getElementById('box' + boxId + '_match');
+            if (!selectEl) return;
+            
+            var savedValue = selectEl.value;
+            selectEl.innerHTML = ''; 
+            
+            activeItemIds.forEach(function(itemId) {
+                var nameInput = document.getElementById('item' + itemId + '_name');
+                var currentName = nameInput ? nameInput.value.trim() : ("商品" + itemId);
+                
+                var opt = document.createElement('option');
+                opt.value = itemId;
+                opt.text = '关联商品' + itemId + ' (' + currentName + ')';
+                selectEl.appendChild(opt);
+            });
+            
+            if (savedValue) {
+                selectEl.value = savedValue;
+            }
+            if (!selectEl.value && selectEl.options.length > 0) {
+                selectEl.value = selectEl.options[0].value;
+            }
+        });
+    }
+
+    function calcSingleItem(id) {
+        var prefix = 'item' + id;
+        var l = parseFloat(document.getElementById(prefix + '_l').value) || 0;
+        var w = parseFloat(document.getElementById(prefix + '_w').value) || 0;
+        var h = parseFloat(document.getElementById(prefix + '_h').value) || 0;
+        var wt = parseFloat(document.getElementById(prefix + '_wt').value) || 0;
+        var price = parseFloat(document.getElementById(prefix + '_price').value) || 0;
+
+        // 获取顶部设置的尺寸安全误差常数
+        var lenBuffer = parseFloat(document.getElementById('cfg_len_buffer').value) || 0;
+
+        // 严格的公制转英制高精度转换
+        var l_in = l * 0.393700787;
+        var w_in = w * 0.393700787;
+        var h_in = h * 0.393700787;
+        var wt_lbs = wt * 2.20462262;
+
+        var sides = [l_in, w_in, h_in].sort(function(a, b) { return b - a; });
+        var max_s = sides[0];
+        var med_s = sides[1];
+        var min_s = sides[2];
+
+        var girth = 2 * (med_s + min_s);
+        var girth_len = max_s + girth;
+        var vol_wt_lbs = (max_s * med_s * min_s) / 139;
+
+        // 1. 尺寸分段判定
+        var tier = "超大件/额外大件";
+        if (max_s <= 15 && med_s <= 12 && min_s <= 0.75 && wt_lbs <= 1) {
+            tier = "小号标准尺寸";
+        } else if (max_s <= 18 && med_s <= 14 && min_s <= 8 && wt_lbs <= 20) {
+            tier = "大号标准尺寸";
+        } else if (max_s <= 37 && med_s <= 28 && min_s <= 20 && girth_len <= 130 && wt_lbs <= 50) {
+            tier = "小号大件";
+        } else if (max_s <= 59 && med_s <= 33 && min_s <= 33 && girth_len <= 130 && wt_lbs <= 50) {
+            tier = "大号大件";
+        }
+
+        // 发货计费重量判定（小号标准件仅看实重，其余取实重与体积重较大者）
+        var bill_wt_lbs = wt_lbs;
+        if (tier !== "小号标准尺寸") {
+            bill_wt_lbs = Math.max(wt_lbs, vol_wt_lbs);
+        }
+
+        // 动态扣减误差缓冲的风险临界值线判定（用于前端高亮提示）
+        var cm_sides = [l, w, h].sort(function(a, b) { return b - a; });
+        var elBadge = document.getElementById(prefix + '_out_tier');
+        var max_limit = 45.72 - lenBuffer; 
+        var med_limit = 35.56 - lenBuffer;
+        var min_limit = 20.32 - lenBuffer;
+
+        if (tier === "小号标准尺寸") {
+            elBadge.className = "badge badge-small-std";
+            elBadge.innerHTML = tier;
+        } else if (tier === "大号标准尺寸") {
+            if (cm_sides[0] >= max_limit || cm_sides[1] >= med_limit || cm_sides[2] >= min_limit) {
+                elBadge.className = "badge badge-risk";
+                elBadge.innerHTML = "大号标准(⚠️临界跳档风险)";
+            } else {
+                elBadge.className = "badge badge-large-std";
+                elBadge.innerHTML = tier;
+            }
+        } else {
+            elBadge.className = "badge badge-oversize";
+            elBadge.innerHTML = tier;
+        }
+
+        // 2. 核心计费精准矩阵 (包含续重精准进位逻辑)
+        var base_fee = 0;
+        if (tier === "小号标准尺寸") {
+            if (bill_wt_lbs <= 0.125) base_fee = (price < 10) ? 2.43 : (price <= 50 ? 3.32 : 3.58);
+            else if (bill_wt_lbs <= 0.25) base_fee = (price < 10) ? 2.49 : (price <= 50 ? 3.42 : 3.68);
+            else if (bill_wt_lbs <= 0.375) base_fee = (price < 10) ? 2.56 : (price <= 50 ? 3.45 : 3.71);
+            else if (bill_wt_lbs <= 0.5) base_fee = (price < 10) ? 2.66 : (price <= 50 ? 3.54 : 3.80);
+            else if (bill_wt_lbs <= 0.625) base_fee = (price < 10) ? 2.77 : (price <= 50 ? 3.68 : 3.94);
+            else if (bill_wt_lbs <= 0.75) base_fee = (price < 10) ? 2.82 : (price <= 50 ? 3.78 : 4.04);
+            else if (bill_wt_lbs <= 0.875) base_fee = (price < 10) ? 2.92 : (price <= 50 ? 3.91 : 4.17);
+            else base_fee = (price < 10) ? 2.95 : (price <= 50 ? 3.96 : 4.22);
+        } 
+        else if (tier === "大号标准尺寸") {
+            if (bill_wt_lbs <= 0.25) base_fee = (price < 10) ? 2.91 : (price <= 50 ? 3.75 : 3.99);
+            else if (bill_wt_lbs <= 0.5) base_fee = (price < 10) ? 3.13 : (price <= 50 ? 3.95 : 4.21);
+            else if (bill_wt_lbs <= 0.75) base_fee = (price < 10) ? 3.38 : (price <= 50 ? 4.20 : 4.46);
+            else if (bill_wt_lbs <= 1.0) base_fee = (price < 10) ? 3.78 : (price <= 50 ? 4.60 : 4.86);
+            else if (bill_wt_lbs <= 1.25) base_fee = (price < 10) ? 4.22 : (price <= 50 ? 5.04 : 5.30);
+            else if (bill_wt_lbs <= 1.5) base_fee = (price < 10) ? 4.60 : (price <= 50 ? 5.42 : 5.68);
+            else if (bill_wt_lbs <= 1.75) base_fee = (price < 10) ? 4.75 : (price <= 50 ? 5.57 : 5.83);
+            else if (bill_wt_lbs <= 2.0) base_fee = (price < 10) ? 5.00 : (price <= 50 ? 5.82 : 6.08);
+            else if (bill_wt_lbs <= 2.25) base_fee = (price < 10) ? 5.10 : (price <= 50 ? 5.92 : 6.18);
+            else if (bill_wt_lbs <= 2.5) base_fee = (price < 10) ? 5.28 : (price <= 50 ? 6.10 : 6.36);
+            else if (bill_wt_lbs <= 2.75) base_fee = (price < 10) ? 5.44 : (price <= 50 ? 6.26 : 6.52);
+            else if (bill_wt_lbs <= 3.0) base_fee = (price < 10) ? 5.85 : (price <= 50 ? 6.67 : 6.93);
+            else {
+                // 大号标准件超过 3 磅：每 0.25 磅（4盎司）为一个进位区间，加收 $0.08
+                var base_anchor = (price < 10) ? 6.15 : (price <= 50 ? 6.97 : 7.23);
+                var over_weight = bill_wt_lbs - 3.0;
+                var intervals = Math.ceil(over_weight / 0.25); 
+                base_fee = base_anchor + (intervals * 0.08);
+            }
+        } 
+        else if (tier === "小号大件") {
+            // 小号大件：首重 1 磅，超过部分每整磅（1 磅）加收 $0.38
+            var oversize_base = (price <= 50) ? 6.73 : 7.55; 
+            if (bill_wt_lbs <= 1.0) {
+                base_fee = oversize_base;
+            } else {
+                var over_weight_os = bill_wt_lbs - 1.0;
+                base_fee = oversize_base + (Math.ceil(over_weight_os) * 0.38);
+            }
+        } 
+        else {
+            // 大号大件及其他超大件：首重 1 磅，超过部分每整磅加收 $0.42
+            var oversize_large_base = (price <= 50) ? 10.30 : 12.05;
+            if (bill_wt_lbs <= 1.0) {
+                base_fee = oversize_large_base;
+            } else {
+                var over_weight_los = bill_wt_lbs - 1.0;
+                base_fee = oversize_large_base + (Math.ceil(over_weight_los) * 0.42);
+            }
+        }
+
+        var fuel_fee = base_fee * 0.035; // 3.5% 燃油附加费
+        var total_fba = base_fee + fuel_fee;
+        var vol_cuft = (l_in * w_in * h_in) / 1728;
+
+        document.getElementById(prefix + '_out_in').innerHTML = l_in.toFixed(2) + '×' + w_in.toFixed(2) + '×' + h_in.toFixed(2);
+        document.getElementById(prefix + '_out_girth').innerHTML = girth_len.toFixed(2);
+        document.getElementById(prefix + '_out_wtlbs').innerHTML = wt_lbs.toFixed(2);
+        document.getElementById(prefix + '_out_volwt').innerHTML = vol_wt_lbs.toFixed(2);
+        document.getElementById(prefix + '_out_billwt').innerHTML = bill_wt_lbs.toFixed(2);
+        document.getElementById(prefix + '_out_base').innerHTML = '$' + base_fee.toFixed(2);
+        document.getElementById(prefix + '_out_fuel').innerHTML = '$' + fuel_fee.toFixed(2);
+        document.getElementById(prefix + '_out_total').innerHTML = '$' + total_fba.toFixed(2);
+        document.getElementById(prefix + '_out_store').innerHTML = '淡:$' + (vol_cuft * 0.87).toFixed(3) + '<br>旺:$' + (vol_cuft * 2.40).toFixed(3);
+    }
+
+    function calcSingleBox(id) {
+        var boxPrefix = 'box' + id;
+        var l = parseFloat(document.getElementById(boxPrefix + '_l').value) || 0;
+        var w = parseFloat(document.getElementById(boxPrefix + '_w').value) || 0;
+        var h = parseFloat(document.getElementById(boxPrefix + '_h').value) || 0;
+        var emp = parseFloat(document.getElementById(boxPrefix + '_emp').value) || 0;
+        var pcs = parseFloat(document.getElementById(boxPrefix + '_pcs').value) || 0;
+        var rate = parseFloat(document.getElementById(boxPrefix + '_rate').value) || 0;
+
+        // 获取顶部动态常数
+        var lenBuffer = parseFloat(document.getElementById('cfg_len_buffer').value) || 0;
+        var wtBuffer = parseFloat(document.getElementById('cfg_wt_buffer').value) || 0;
+
+        var matchedItemId = document.getElementById(boxPrefix + '_match').value;
+        var unit_wt = 0;
+        
+        var weightInput = document.getElementById('item' + matchedItemId + '_wt');
+        if (weightInput) {
+            unit_wt = parseFloat(weightInput.value) || 0;
+        }
+
+        var total_act_wt = emp + (unit_wt * pcs);
+        var vol_m3 = (l * w * h) / 1000000;
+        var vol_wt_kg = (l * w * h) / 6000;
+        var bill_wt_kg = Math.max(total_act_wt, vol_wt_kg);
+
+        var total_fee = bill_wt_kg * rate;
+        var unit_fee = pcs > 0 ? (total_fee / pcs) : 0;
+
+        // 1. 绝对超标拦截检测 (以 FBA 官方强制大货门槛为准)
+        var sizeViolation = (l > 63.5 || w > 63.5 || h > 63.5);
+        var weightViolation = (total_act_wt > 22.67);
+
+        // 2. 动态临界风险警告检测 (结合运营输入的误差常数)
+        var sizeRisk = (l > (63.5 - lenBuffer) || w > (63.5 - lenBuffer) || h > (63.5 - lenBuffer));
+        var weightRisk = (total_act_wt > (22.67 - wtBuffer));
+
+        var statusEl = document.getElementById(boxPrefix + '_out_status');
+
+        if (sizeViolation || weightViolation) {
+            if (sizeViolation && weightViolation) {
+                statusEl.className = "badge badge-oversize";
+                statusEl.innerHTML = "❌ 尺寸+重量均超标";
+            } else if (sizeViolation) {
+                statusEl.className = "badge badge-oversize";
+                statusEl.innerHTML = "❌ 单边超标(>63.5cm)";
+            } else {
+                statusEl.className = "badge badge-oversize";
+                statusEl.innerHTML = "❌ 重量超标(>22.67kg)";
+            }
+        } else if (sizeRisk || weightRisk) {
+            if (sizeRisk && weightRisk) {
+                statusEl.className = "badge badge-risk";
+                statusEl.innerHTML = "⚠️ 尺寸与重量临界风险";
+            } else if (sizeRisk) {
+                statusEl.className = "badge badge-risk";
+                statusEl.innerHTML = "⚠️ 单边临界风险";
+            } else {
+                statusEl.className = "badge badge-risk";
+                statusEl.innerHTML = "⚠️ 重量临界风险";
+            }
+        } else {
+            statusEl.className = "badge badge-large-std";
+            statusEl.innerHTML = "✅ 完全合规";
+        }
+
+        document.getElementById(boxPrefix + '_out_actwt').innerHTML = total_act_wt.toFixed(2) + ' kg';
+        document.getElementById(boxPrefix + '_out_m3').innerHTML = vol_m3.toFixed(4);
+        document.getElementById(boxPrefix + '_out_volwt').innerHTML = vol_wt_kg.toFixed(2) + ' kg';
+        document.getElementById(boxPrefix + '_out_billwt').innerHTML = bill_wt_kg.toFixed(2) + ' kg';
+        document.getElementById(boxPrefix + '_out_totalfee').innerHTML = '$' + total_fee.toFixed(2);
+        document.getElementById(boxPrefix + '_out_unitfee').innerHTML = '$' + unit_fee.toFixed(2);
+    }
+
+    function doGlobalCalculate() {
+        try {
+            syncAllBoxDropdowns();
+
+            activeItemIds.forEach(function(id) {
+                calcSingleItem(id);
+            });
+
+            activeBoxIds.forEach(function(id) {
+                calcSingleBox(id);
+            });
+
+        } catch (err) {
+            alert("测算执行遇到未捕捉异常，请检查输入的数值是否正确: " + err.message);
+        }
+    }
+
+    window.onload = function() {
+        doGlobalCalculate();
+    };
+</script>
+
+</body>
+</html>
