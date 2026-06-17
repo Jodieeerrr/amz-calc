@@ -76,7 +76,6 @@
             width: fit-content;
         }
 
-        /* 风险缓冲常数控制区样式 */
         .buffer-controls {
             display: flex;
             align-items: center;
@@ -179,6 +178,52 @@
             min-width: 1550px;
         }
 
+        /* 基础判断表格列宽控制（6列） */
+        table.criteria-table {
+            min-width: 1200px;
+            table-layout: fixed;
+            width: 100%;
+        }
+        table.criteria-table th:nth-child(1) { width: 18%; } /* 商品尺寸分段 */
+        table.criteria-table th:nth-child(2) { width: 16%; } /* 发货重量¹ */
+        table.criteria-table th:nth-child(3) { width: 22%; } /* 最长边 */
+        table.criteria-table th:nth-child(4) { width: 11%; } /* 次长边 */
+        table.criteria-table th:nth-child(5) { width: 11%; } /* 最短边 */
+        table.criteria-table th:nth-child(6) { width: 12%; } /* 长度加围长 */
+
+        /* 配送费率表列宽控制（5列） */
+        table.ref-table {
+            min-width: 1200px;
+            table-layout: fixed;
+            width: 100%;
+        }
+        table.ref-table th:nth-child(1) { width: 15%; } /* 尺寸分段 */
+        table.ref-table th:nth-child(2) { width: 13%; } /* 发货重量 */
+        table.ref-table th:nth-child(3) { width: 24%; } /* <10美元 */
+        table.ref-table th:nth-child(4) { width: 24%; } /* 10-50美元 */
+        table.ref-table th:nth-child(5) { width: 24%; } /* >50美元 */
+
+        /* 统一标准选项卡中两个参考表格的内边距与行高 */
+        table.criteria-table th, table.criteria-table td,
+        table.ref-table th, table.ref-table td {
+            padding: 12px 14px;
+            line-height: 1.5;
+            vertical-align: middle;
+        }
+
+        .section-title {
+            font-size: 15px;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin: 10px 0 12px 0;
+        }
+
+        .split-line {
+            margin: 30px 0;
+            border: 0;
+            border-top: 1px dashed var(--border-color);
+        }
+
         th {
             background-color: #fafafa;
             color: #262626;
@@ -256,6 +301,7 @@
     <div class="tab-box">
         <button id="tab-btn-item" class="tab-btn active" onclick="switchTab('item')">单品尺寸分级与 FBA 费用计算</button>
         <button id="tab-btn-box" class="tab-btn" onclick="switchTab('box')">外箱合规测试以及效益计算</button>
+        <button id="tab-btn-standard" class="tab-btn" onclick="switchTab('standard')">亚马逊尺寸分段标准表格</button>
     </div>
 
     <div id="tab-content-item" class="tab-content active">
@@ -265,9 +311,9 @@
                 <thead>
                     <tr>
                         <th style="width: 140px;">商品名称</th>
-                        <th style="width: 180px;">输入包装尺寸 (长×宽×高 cm)</th>
-                        <th style="width: 80px;">商品实重 (kg)</th>
-                        <th style="width: 80px;">预估售价 ($)</th>
+                        <th style="width: 240px;">输入包装尺寸 (长×宽×高 cm)</th>
+                        <th style="width: 110px;">商品实重 (kg)</th>
+                        <th style="width: 110px;">预估售价 ($)</th>
                         <th style="width: 120px;" class="calc-cell">转换英寸单位 (in)</th>
                         <th style="width: 90px;" class="calc-cell">围长+最长边</th>
                         <th style="width: 80px;" class="calc-cell">实重 (lbs)</th>
@@ -359,8 +405,8 @@
                 <thead>
                     <tr>
                         <th style="width: 130px;">外箱货件名称</th>
-                        <th style="width: 170px;">外箱长×宽×高 (cm)</th>
-                        <th style="width: 80px;">空箱重量 (kg)</th>
+                        <th style="width: 240px;">外箱长×宽×高 (cm)</th>
+                        <th style="width: 110px;">空箱重量 (kg)</th>
                         <th style="width: 210px;">对应第一部分关联单品</th>
                         <th style="width: 80px;">单箱量 (pcs)</th>
                         <th style="width: 160px;">外箱风控合规检查状态</th>
@@ -420,6 +466,92 @@
             </table>
         </div>
     </div>
+
+    <div id="tab-content-standard" class="tab-content">
+        <div class="section-title">📊 1. 商品尺寸分段基本判定标准</div>
+        <div class="table-container">
+            <table class="criteria-table">
+                <thead>
+                    <tr>
+                        <th>商品尺寸分段</th>
+                        <th>发货重量¹</th>
+                        <th>最长边</th>
+                        <th>次长边</th>
+                        <th>最短边</th>
+                        <th>长度加围长</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>小号标准尺寸</td><td>不超过 16 盎司</td><td>不超过 15 英寸</td><td>不超过 12 英寸</td><td>不超过 0.75 英寸</td><td>不适用</td></tr>
+                    <tr><td>大号标准尺寸</td><td>不超过 20 磅</td><td>不超过 18 英寸</td><td>不超过 14 英寸</td><td>不超过 8 英寸</td><td>不适用</td></tr>
+                    <tr><td>小号大件</td><td>不超过 50 磅</td><td>不超过 37 英寸</td><td>不超过 28 英寸</td><td>不超过 20 英寸</td><td>不超过 130 英寸</td></tr>
+                    <tr><td>大号大件</td><td>不超过 50 磅</td><td>不超过 59 英寸</td><td>不超过 33 英寸</td><td>不超过 33 英寸</td><td>不超过 130 英寸</td></tr>
+                    <tr><td>超大件 (0 至 50 磅)</td><td>不超过 50 磅</td><td>（见下方说明）</td><td>（见下方说明）</td><td>（见下方说明）</td><td>（见下方说明）</td></tr>
+                    <tr>
+                        <td>超大件 (50 至 70 磅[不含 50 磅])</td>
+                        <td>50 至 70 磅（不含 50 磅）</td>
+                        <td colspan="4" style="color: #555;">超大件商品的最长边超过 59 英寸、次长边超过 33 英寸、最短边超过 33 英寸或者长度加围长超过 130 英寸，或者商品重量或体积重量中的较大值超过 50 磅。</td>
+                    </tr>
+                    <tr>
+                        <td>超大件 (70 至 150 磅[不含 70 磅])</td>
+                        <td>70 至 150 磅（不含 70 磅）</td>
+                        <td colspan="4" style="color: #555;">最长边超过 96 英寸或者长度加围长超过 130 英寸的超大件（不超过 150 磅）商品将被视为特大号商品。</td>
+                    </tr>
+                    <tr>
+                        <td>超大件 (150 磅以上[不含 150 磅])</td>
+                        <td>超过 150 磅</td>
+                        <td colspan="4" style="text-align: center; color: #999;">-</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <hr class="split-line">
+
+        <div class="section-title">💰 2. 2026 亚马逊FBA尾程配送费表格</div>
+        <div class="table-container">
+            <table class="ref-table">
+                <thead>
+                    <tr>
+                        <th>尺寸分段</th>
+                        <th>发货重量</th>
+                        <th>&lt;10美元</th>
+                        <th>10-50美元</th>
+                        <th>&gt;50美元</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>小号标准尺寸</td><td>不超过2盎司</td><td>2.43</td><td>3.32</td><td>3.58</td></tr>
+                    <tr><td>小号标准尺寸</td><td>2至4盎司</td><td>2.49</td><td>3.42</td><td>3.68</td></tr>
+                    <tr><td>小号标准尺寸</td><td>4至6</td><td>2.56</td><td>3.45</td><td>3.71</td></tr>
+                    <tr><td>小号标准尺寸</td><td>6至8</td><td>2.66</td><td>3.54</td><td>3.8</td></tr>
+                    <tr><td>小号标准尺寸</td><td>8至10</td><td>2.77</td><td>3.68</td><td>3.94</td></tr>
+                    <tr><td>小号标准尺寸</td><td>10至12</td><td>2.82</td><td>3.78</td><td>4.04</td></tr>
+                    <tr><td>小号标准尺寸</td><td>12至14</td><td>2.92</td><td>3.91</td><td>4.17</td></tr>
+                    <tr><td>小号标准尺寸</td><td>14至16</td><td>2.95</td><td>3.96</td><td>4.22</td></tr>
+                    <tr><td>大号标准尺寸</td><td>不超过 4 盎司</td><td>$2.91</td><td>$3.73</td><td>$3.99</td></tr>
+                    <tr><td>大号标准尺寸</td><td>4 至 8 盎司 (不含 4)</td><td>$3.13</td><td>$3.95</td><td>$4.21</td></tr>
+                    <tr><td>大号标准尺寸</td><td>8 至 12 盎司 (不含 8)</td><td>$3.38</td><td>$4.20</td><td>$4.46</td></tr>
+                    <tr><td>大号standard尺寸</td><td>12 至 16 盎司 (不含 12)</td><td>$3.78</td><td>$4.60</td><td>$4.86</td></tr>
+                    <tr><td>大号标准尺寸</td><td>1 至 1.25 磅 (不含 1)</td><td>$4.22</td><td>$5.04</td><td>$5.30</td></tr>
+                    <tr><td>大号标准尺寸</td><td>1.25 至 1.5 磅 (不含 1.25)</td><td>$4.60</td><td>$5.42</td><td>$5.68</td></tr>
+                    <tr><td>大号标准尺寸</td><td>1.5 至 1.75 磅 (不含 1.5)</td><td>$4.75</td><td>$5.57</td><td>$5.83</td></tr>
+                    <tr><td>大号标准尺寸</td><td>1.75 至 2 磅 (不含 1.75)</td><td>$5.00</td><td>$5.82</td><td>$6.08</td></tr>
+                    <tr><td>大号标准尺寸</td><td>2 至 2.25 磅 (不含 2)</td><td>$5.10</td><td>$5.92</td><td>$6.18</td></tr>
+                    <tr><td>大号标准尺寸</td><td>2.25 至 2.5 磅 (不含 2.25)</td><td>$5.28</td><td>$6.10</td><td>$6.36</td></tr>
+                    <tr><td>大号标准尺寸</td><td>2.5 至 2.75 磅 (不含 2.5)</td><td>$5.44</td><td>$6.26</td><td>$6.52</td></tr>
+                    <tr><td>大号标准尺寸</td><td>2.75 至 3 磅 (不含 2.75)</td><td>$5.85</td><td>$6.67</td><td>$6.93</td></tr>
+                    <tr><td>大号标准尺寸</td><td>3 至 20 磅 (不含 3)</td><td>$6.15 + 超出首重部分每 4 盎司 $0.08</td><td>$6.97 + 超出首重部分每 4 盎司 $0.08</td><td>$7.23 + 超出首重部分每 4 盎司 $0.08</td></tr>
+                    <tr><td>小号大件</td><td>0 至 50 磅</td><td>$8.78 + 超出首重部分每磅 $0.38</td><td>$7.55 + 超出首重部分每磅 $0.38</td><td>$7.55 + 超出首重部分每磅 $0.38</td></tr>
+                    <tr><td>大号大件</td><td>0 至 50 磅</td><td>$8.85 + 超出首重部分每磅 $0.38</td><td>$9.35 + 超出首重部分每磅 $0.38</td><td>$9.35 + 超出首重部分每磅 $0.38</td></tr>
+                    <tr><td>超大件: 0 至 50 磅</td><td>0 至 50 磅</td><td>$25.56 + 超出首重部分每磅 $0.38</td><td>$26.33 + 超出首重部分每磅 $0.38</td><td>$26.33 + 超出首重部分每磅 $0.38</td></tr>
+                    <tr><td>超大件: 50 到 70 磅 (不含 50)</td><td>50 至 70 磅</td><td>$36.55 + 超出首重 51 磅的部分每磅 $0.75</td><td>$37.32 + 超出首重 51 磅的部分每磅 $0.75</td><td>$37.32 + 超出首重 51 磅的部分每磅 $0.75</td></tr>
+                    <tr><td>超大件: 70 至 150 磅 (不含 70)</td><td>70 至 150 磅</td><td>$50.55 + 超出首重 71 磅的部分每磅 $0.75</td><td>$51.32 + 超出首重 71 磅的部分每磅 $0.75</td><td>$51.32 + 超出首重 71 磅的部分每磅 $0.75</td></tr>
+                    <tr><td>超大件: 超过 150 磅</td><td>150 磅以上</td><td>$194.18 + 超出首重 151 磅的部分每磅 $0.19</td><td>$194.95 + 超出首重 151 磅的部分每磅 $0.19</td><td>$194.95 + 超出首重 151 磅的部分每磅 $0.19</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -431,20 +563,19 @@
     function switchTab(target) {
         var itemContent = document.getElementById('tab-content-item');
         var boxContent = document.getElementById('tab-content-box');
+        var standardContent = document.getElementById('tab-content-standard');
+        
         var itemBtn = document.getElementById('tab-btn-item');
         var boxBtn = document.getElementById('tab-btn-box');
+        var standardBtn = document.getElementById('tab-btn-standard');
 
-        if (target === 'item') {
-            itemContent.style.display = 'block';
-            boxContent.style.display = 'none';
-            itemBtn.className = 'tab-btn active';
-            boxBtn.className = 'tab-btn';
-        } else {
-            itemContent.style.display = 'none';
-            boxContent.style.display = 'block';
-            itemBtn.className = 'tab-btn';
-            boxBtn.className = 'tab-btn';
-        }
+        itemContent.style.display = target === 'item' ? 'block' : 'none';
+        boxContent.style.display = target === 'box' ? 'block' : 'none';
+        standardContent.style.display = target === 'standard' ? 'block' : 'none';
+
+        itemBtn.className = target === 'item' ? 'tab-btn active' : 'tab-btn';
+        boxBtn.className = target === 'box' ? 'tab-btn active' : 'tab-btn';
+        standardBtn.className = target === 'standard' ? 'tab-btn active' : 'tab-btn';
     }
 
     function addNewItemRow() {
@@ -545,10 +676,8 @@
         var wt = parseFloat(document.getElementById(prefix + '_wt').value) || 0;
         var price = parseFloat(document.getElementById(prefix + '_price').value) || 0;
 
-        // 获取顶部设置的尺寸安全误差常数
         var lenBuffer = parseFloat(document.getElementById('cfg_len_buffer').value) || 0;
 
-        // 严格的公制转英制高精度转换
         var l_in = l * 0.393700787;
         var w_in = w * 0.393700787;
         var h_in = h * 0.393700787;
@@ -563,7 +692,6 @@
         var girth_len = max_s + girth;
         var vol_wt_lbs = (max_s * med_s * min_s) / 139;
 
-        // 1. 尺寸分段判定
         var tier = "超大件/额外大件";
         if (max_s <= 15 && med_s <= 12 && min_s <= 0.75 && wt_lbs <= 1) {
             tier = "小号标准尺寸";
@@ -575,13 +703,11 @@
             tier = "大号大件";
         }
 
-        // 发货计费重量判定（小号标准件仅看实重，其余取实重与体积重较大者）
         var bill_wt_lbs = wt_lbs;
         if (tier !== "小号标准尺寸") {
             bill_wt_lbs = Math.max(wt_lbs, vol_wt_lbs);
         }
 
-        // 动态扣减误差缓冲的风险临界值线判定（用于前端高亮提示）
         var cm_sides = [l, w, h].sort(function(a, b) { return b - a; });
         var elBadge = document.getElementById(prefix + '_out_tier');
         var max_limit = 45.72 - lenBuffer; 
@@ -604,7 +730,6 @@
             elBadge.innerHTML = tier;
         }
 
-        // 2. 核心计费精准矩阵 (包含续重精准进位逻辑)
         var base_fee = 0;
         if (tier === "小号标准尺寸") {
             if (bill_wt_lbs <= 0.125) base_fee = (price < 10) ? 2.43 : (price <= 50 ? 3.32 : 3.58);
@@ -630,7 +755,6 @@
             else if (bill_wt_lbs <= 2.75) base_fee = (price < 10) ? 5.44 : (price <= 50 ? 6.26 : 6.52);
             else if (bill_wt_lbs <= 3.0) base_fee = (price < 10) ? 5.85 : (price <= 50 ? 6.67 : 6.93);
             else {
-                // 大号标准件超过 3 磅：每 0.25 磅（4盎司）为一个进位区间，加收 $0.08
                 var base_anchor = (price < 10) ? 6.15 : (price <= 50 ? 6.97 : 7.23);
                 var over_weight = bill_wt_lbs - 3.0;
                 var intervals = Math.ceil(over_weight / 0.25); 
@@ -638,7 +762,6 @@
             }
         } 
         else if (tier === "小号大件") {
-            // 小号大件：首重 1 磅，超过部分每整磅（1 磅）加收 $0.38
             var oversize_base = (price <= 50) ? 6.73 : 7.55; 
             if (bill_wt_lbs <= 1.0) {
                 base_fee = oversize_base;
@@ -648,7 +771,6 @@
             }
         } 
         else {
-            // 大号大件及其他超大件：首重 1 磅，超过部分每整磅加收 $0.42
             var oversize_large_base = (price <= 50) ? 10.30 : 12.05;
             if (bill_wt_lbs <= 1.0) {
                 base_fee = oversize_large_base;
@@ -658,7 +780,7 @@
             }
         }
 
-        var fuel_fee = base_fee * 0.035; // 3.5% 燃油附加费
+        var fuel_fee = base_fee * 0.035; 
         var total_fba = base_fee + fuel_fee;
         var vol_cuft = (l_in * w_in * h_in) / 1728;
 
@@ -682,7 +804,6 @@
         var pcs = parseFloat(document.getElementById(boxPrefix + '_pcs').value) || 0;
         var rate = parseFloat(document.getElementById(boxPrefix + '_rate').value) || 0;
 
-        // 获取顶部动态常数
         var lenBuffer = parseFloat(document.getElementById('cfg_len_buffer').value) || 0;
         var wtBuffer = parseFloat(document.getElementById('cfg_wt_buffer').value) || 0;
 
@@ -702,11 +823,9 @@
         var total_fee = bill_wt_kg * rate;
         var unit_fee = pcs > 0 ? (total_fee / pcs) : 0;
 
-        // 1. 绝对超标拦截检测 (以 FBA 官方强制大货门槛为准)
         var sizeViolation = (l > 63.5 || w > 63.5 || h > 63.5);
         var weightViolation = (total_act_wt > 22.67);
 
-        // 2. 动态临界风险警告检测 (结合运营输入的误差常数)
         var sizeRisk = (l > (63.5 - lenBuffer) || w > (63.5 - lenBuffer) || h > (63.5 - lenBuffer));
         var weightRisk = (total_act_wt > (22.67 - wtBuffer));
 
