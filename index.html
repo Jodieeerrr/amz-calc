@@ -352,7 +352,8 @@
     <div class="tab-box">
         <button id="tab-btn-item" class="tab-btn active" onclick="switchTab('item')">单品尺寸分级与 FBA 费用计算</button>
         <button id="tab-btn-box" class="tab-btn" onclick="switchTab('box')">外箱合规测试以及效益计算</button>
-        <button id="tab-btn-standard" class="tab-btn" onclick="switchTab('standard')">亚马逊尺寸分段标准表格</button>
+        <button id="tab-btn-std-imp" class="tab-btn" onclick="switchTab('std-imp')">亚马逊尺寸分段标准 (英制/lbs)</button>
+        <button id="tab-btn-std-met" class="tab-btn" onclick="switchTab('std-met')">亚马逊尺寸分段标准 (公制/kg)</button>
     </div>
 
     <div id="tab-content-item" class="tab-content active">
@@ -457,6 +458,8 @@
                     <tr>
                         <th style="width: 130px;">外箱货件名称</th>
                         <th style="width: 240px;">外箱长×宽×高 (cm)</th>
+                        <th style="width: 120px;" class="calc-cell">转换英寸单位 (in)</th>
+                        <th style="width: 100px;" class="calc-cell">外箱实重 (lbs)</th>
                         <th style="width: 110px;">空箱重量 (kg)</th>
                         <th style="width: 210px;">对应第一部分关联单品</th>
                         <th style="width: 80px;">单箱量 (pcs)</th>
@@ -480,6 +483,8 @@
                                 <input type="number" step="0.1" id="box1_h" value="40.0">
                             </div>
                         </td>
+                        <td class="calc-cell" id="box1_out_in">—</td>
+                        <td class="calc-cell" id="box1_out_lbs">—</td>
                         <td><input type="number" step="0.1" id="box1_emp" value="1.2" class="table-input"></td>
                         <td><select id="box1_match" class="table-select"><option value="1">关联商品1</option></select></td>
                         <td><input type="number" id="box1_pcs" value="24" class="table-input"></td>
@@ -501,6 +506,8 @@
                                 <input type="number" step="0.1" id="box2_h" value="42.0">
                             </div>
                         </td>
+                        <td class="calc-cell" id="box2_out_in">—</td>
+                        <td class="calc-cell" id="box2_out_lbs">—</td>
                         <td><input type="number" step="0.1" id="box2_emp" value="1.5" class="table-input"></td>
                         <td><select id="box2_match" class="table-select"><option value="2">关联商品2</option></select></td>
                         <td><input type="number" id="box2_pcs" value="8" class="table-input"></td>
@@ -518,8 +525,8 @@
         </div>
     </div>
 
-    <div id="tab-content-standard" class="tab-content">
-        <div class="section-title">📊 1. 商品尺寸分段基本判定标准</div>
+    <div id="tab-content-std-imp" class="tab-content">
+        <div class="section-title">📊 1. 商品尺寸分段基本判定标准 (英寸/磅)</div>
         <div class="table-container">
             <table class="criteria-table">
                 <thead>
@@ -559,7 +566,7 @@
 
         <hr class="split-line">
 
-        <div class="section-title">💰 2. 2026 亚马逊FBA尾程配送费表格</div>
+        <div class="section-title">💰 2. 2026 亚马逊FBA尾程配送费表格 (英寸/磅)</div>
         <div class="table-container">
             <table class="ref-table">
                 <thead>
@@ -574,12 +581,12 @@
                 <tbody>
                     <tr><td>小号标准尺寸</td><td>不超过2盎司</td><td>2.43</td><td>3.32</td><td>3.58</td></tr>
                     <tr><td>小号标准尺寸</td><td>2至4盎司</td><td>2.49</td><td>3.42</td><td>3.68</td></tr>
-                    <tr><td>小号标准尺寸</td><td>4至6</td><td>2.56</td><td>3.45</td><td>3.71</td></tr>
-                    <tr><td>小号标准尺寸</td><td>6至8</td><td>2.66</td><td>3.54</td><td>3.8</td></tr>
-                    <tr><td>小号标准尺寸</td><td>8至10</td><td>2.77</td><td>3.68</td><td>3.94</td></tr>
-                    <tr><td>小号标准尺寸</td><td>10至12</td><td>2.82</td><td>3.78</td><td>4.04</td></tr>
-                    <tr><td>小号标准尺寸</td><td>12至14</td><td>2.92</td><td>3.91</td><td>4.17</td></tr>
-                    <tr><td>小号标准尺寸</td><td>14至16</td><td>2.95</td><td>3.96</td><td>4.22</td></tr>
+                    <tr><td>小号标准尺寸</td><td>4至6盎司</td><td>2.56</td><td>3.45</td><td>3.71</td></tr>
+                    <tr><td>小号标准尺寸</td><td>6至8盎司</td><td>2.66</td><td>3.54</td><td>3.8</td></tr>
+                    <tr><td>小号标准尺寸</td><td>8至10盎司</td><td>2.77</td><td>3.68</td><td>3.94</td></tr>
+                    <tr><td>小号标准尺寸</td><td>10至12盎司</td><td>2.82</td><td>3.78</td><td>4.04</td></tr>
+                    <tr><td>小号标准尺寸</td><td>12至14盎司</td><td>2.92</td><td>3.91</td><td>4.17</td></tr>
+                    <tr><td>小号标准尺寸</td><td>14至16盎司</td><td>2.95</td><td>3.96</td><td>4.22</td></tr>
                     <tr><td>大号标准尺寸</td><td>不超过 4 盎司</td><td>$2.91</td><td>$3.73</td><td>$3.99</td></tr>
                     <tr><td>大号标准尺寸</td><td>4 至 8 盎司 (不含 4)</td><td>$3.13</td><td>$3.95</td><td>$4.21</td></tr>
                     <tr><td>大号标准尺寸</td><td>8 至 12 盎司 (不含 8)</td><td>$3.38</td><td>$4.20</td><td>$4.46</td></tr>
@@ -603,6 +610,92 @@
             </table>
         </div>
     </div>
+
+    <div id="tab-content-std-met" class="tab-content">
+        <div class="section-title">📊 1. 商品尺寸分段基本判定标准 (厘米/千克)</div>
+        <div class="table-container">
+            <table class="criteria-table">
+                <thead>
+                    <tr>
+                        <th>商品尺寸分段</th>
+                        <th>发货重量¹</th>
+                        <th>最长边</th>
+                        <th>次长边</th>
+                        <th>最短边</th>
+                        <th>长度加围长</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>小号标准尺寸</td><td>不超过 0.45 kg</td><td>不超过 38.1 cm</td><td>不超过 30.5 cm</td><td>不超过 1.9 cm</td><td>不适用</td></tr>
+                    <tr><td>大号标准尺寸</td><td>不超过 9.07 kg</td><td>不超过 45.7 cm</td><td>不超过 35.6 cm</td><td>不超过 20.3 cm</td><td>不适用</td></tr>
+                    <tr><td>小号大件</td><td>不超过 22.68 kg</td><td>不超过 94.0 cm</td><td>不超过 71.1 cm</td><td>不超过 50.8 cm</td><td>不超过 330.2 cm</td></tr>
+                    <tr><td>大号大件</td><td>不超过 22.68 kg</td><td>不超过 149.9 cm</td><td>不超过 83.8 cm</td><td>不超过 83.8 cm</td><td>不超过 330.2 cm</td></tr>
+                    <tr><td>超大件 (0 至 22.68 kg)</td><td>不超过 22.68 kg</td><td>（见下方说明）</td><td>（见下方说明）</td><td>（见下方说明）</td><td>（见下方说明）</td></tr>
+                    <tr>
+                        <td>超大件 (22.68 至 31.75 kg[不含 22.68 kg])</td>
+                        <td>22.68 至 31.75 kg（不含 22.68 kg）</td>
+                        <td colspan="4" style="color: #555;">超大件商品的最长边超过 149.9 cm、次长边超过 83.8 cm、最短边超过 83.8 cm或者长度加围长超过 330.2 cm，或者商品重量或体积重量中的较大值超过 22.68 kg。</td>
+                    </tr>
+                    <tr>
+                        <td>超大件 (31.75 至 68.04 kg[不含 31.75 kg])</td>
+                        <td>31.75 至 68.04 kg（不含 31.75 kg）</td>
+                        <td colspan="4" style="color: #555;">最长边超过 243.8 cm或者长度加围长超过 330.2 cm的超大件（不超过 68.04 kg）商品将被视为特大号商品。</td>
+                    </tr>
+                    <tr>
+                        <td>超大件 (68.04 kg以上[不含 68.04 kg])</td>
+                        <td>超过 68.04 kg</td>
+                        <td colspan="4" style="text-align: center; color: #999;">-</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <hr class="split-line">
+
+        <div class="section-title">💰 2. 2026 亚马逊FBA尾程配送费表格 (厘米/千克换算版)</div>
+        <div class="table-container">
+            <table class="ref-table">
+                <thead>
+                    <tr>
+                        <th>尺寸分段</th>
+                        <th>发货重量</th>
+                        <th>&lt;10美元</th>
+                        <th>10-50美元</th>
+                        <th>&gt;50美元</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>小号标准尺寸</td><td>不超过 56.7 g</td><td>2.43</td><td>3.32</td><td>3.58</td></tr>
+                    <tr><td>小号标准尺寸</td><td>56.7 至 113.4 g</td><td>2.49</td><td>3.42</td><td>3.68</td></tr>
+                    <tr><td>小号标准尺寸</td><td>113.4 至 170.1 g</td><td>2.56</td><td>3.45</td><td>3.71</td></tr>
+                    <tr><td>小号标准尺寸</td><td>170.1 至 226.8 g</td><td>2.66</td><td>3.54</td><td>3.8</td></tr>
+                    <tr><td>小号标准尺寸</td><td>226.8 至 283.5 g</td><td>2.77</td><td>3.68</td><td>3.94</td></tr>
+                    <tr><td>小号标准尺寸</td><td>283.5 至 340.2 g</td><td>2.82</td><td>3.78</td><td>4.04</td></tr>
+                    <tr><td>小号标准尺寸</td><td>340.2 至 396.9 g</td><td>2.92</td><td>3.91</td><td>4.17</td></tr>
+                    <tr><td>小号标准尺寸</td><td>396.9 至 453.6 g</td><td>2.95</td><td>3.96</td><td>4.22</td></tr>
+                    <tr><td>大号标准尺寸</td><td>不超过 113.4 g</td><td>$2.91</td><td>$3.73</td><td>$3.99</td></tr>
+                    <tr><td>大号标准尺寸</td><td>113.4 至 226.8 g (不含 113.4)</td><td>$3.13</td><td>$3.95</td><td>$4.21</td></tr>
+                    <tr><td>大号标准尺寸</td><td>226.8 至 340.2 g (不含 226.8)</td><td>$3.38</td><td>$4.20</td><td>$4.46</td></tr>
+                    <tr><td>大号standard尺寸</td><td>340.2 至 453.6 g (不含 340.2)</td><td>$3.78</td><td>$4.60</td><td>$4.86</td></tr>
+                    <tr><td>大号标准尺寸</td><td>0.45 至 0.57 kg (不含 0.45)</td><td>$4.22</td><td>$5.04</td><td>$5.30</td></tr>
+                    <tr><td>大号标准尺寸</td><td>0.57 至 0.68 kg (不含 0.57)</td><td>$4.60</td><td>$5.42</td><td>$5.68</td></tr>
+                    <tr><td>大号标准尺寸</td><td>0.68 至 0.79 kg (不含 0.68)</td><td>$4.75</td><td>$5.57</td><td>$5.83</td></tr>
+                    <tr><td>大号标准尺寸</td><td>0.79 至 0.91 kg (不含 0.79)</td><td>$5.00</td><td>$5.82</td><td>$6.08</td></tr>
+                    <tr><td>大号标准尺寸</td><td>0.91 至 1.02 kg (不含 0.91)</td><td>$5.10</td><td>$5.92</td><td>$6.18</td></tr>
+                    <tr><td>大号标准尺寸</td><td>1.02 至 1.13 kg (不含 1.02)</td><td>$5.28</td><td>$6.10</td><td>$6.36</td></tr>
+                    <tr><td>大号标准尺寸</td><td>1.13 至 1.25 kg (不含 1.13)</td><td>$5.44</td><td>$6.26</td><td>$6.52</td></tr>
+                    <tr><td>大号标准尺寸</td><td>1.25 至 1.36 kg (不含 1.25)</td><td>$5.85</td><td>$6.67</td><td>$6.93</td></tr>
+                    <tr><td>大号标准尺寸</td><td>1.36 至 9.07 kg (不含 1.36)</td><td>$6.15 + 超出首重部分每 113.4g $0.08</td><td>$6.97 + 超出首重部分每 113.4g $0.08</td><td>$7.23 + 超出首重部分每 113.4g $0.08</td></tr>
+                    <tr><td>小号大件</td><td>0 至 22.68 kg</td><td>$8.78 + 超出首重部分每 0.45kg $0.38</td><td>$7.55 + 超出首重部分每 0.45kg $0.38</td><td>$7.55 + 超出首重部分每 0.45kg $0.38</td></tr>
+                    <tr><td>大号大件</td><td>0 至 22.68 kg</td><td>$8.85 + 超出首重部分每 0.45kg $0.38</td><td>$9.35 + 超出首重部分每 0.45kg $0.38</td><td>$9.35 + 超出首重部分每 0.45kg $0.38</td></tr>
+                    <tr><td>超大件: 0 至 22.68 kg</td><td>0 至 22.68 kg</td><td>$25.56 + 超出首重部分每 0.45kg $0.38</td><td>$26.33 + 超出首重部分每 0.45kg $0.38</td><td>$26.33 + 超出首重部分每 0.45kg $0.38</td></tr>
+                    <tr><td>超大件: 22.68 到 31.75 kg (不含 22.68)</td><td>22.68 至 31.75 kg</td><td>$36.55 + 超出首重 23.13kg 的部分每 0.45kg $0.75</td><td>$37.32 + 超出首重 23.13kg 的部分每 0.45kg $0.75</td><td>$37.32 + 超出首重 23.13kg 的部分每 0.45kg $0.75</td></tr>
+                    <tr><td>超大件: 31.75 至 68.04 kg (不含 31.75)</td><td>31.75 至 68.04 kg</td><td>$50.55 + 超出首重 32.21kg 的部分每 0.45kg $0.75</td><td>$51.32 + 超出首重 32.21kg 的部分每 0.45kg $0.75</td><td>$51.32 + 超出首重 32.21kg 的部分每 0.45kg $0.75</td></tr>
+                    <tr><td>超大件: 超过 68.04 kg</td><td>68.04 kg 以上</td><td>$194.18 + 超出首重 68.49kg 的部分每 0.45kg $0.19</td><td>$194.95 + 超出首重 68.49kg 的部分每 0.45kg $0.19</td><td>$194.95 + 超出首重 68.49kg 的部分每 0.45kg $0.19</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -611,7 +704,6 @@
     var activeBoxIds = [1, 2];
     var maxBoxId = 2;
 
-    // 初始化双向单位换算器事件绑定
     function initConverter() {
         var cm = document.getElementById('conv_cm');
         var inc = document.getElementById('conv_in');
@@ -639,19 +731,23 @@
     function switchTab(target) {
         var itemContent = document.getElementById('tab-content-item');
         var boxContent = document.getElementById('tab-content-box');
-        var standardContent = document.getElementById('tab-content-standard');
+        var stdImpContent = document.getElementById('tab-content-std-imp');
+        var stdMetContent = document.getElementById('tab-content-std-met');
         
         var itemBtn = document.getElementById('tab-btn-item');
         var boxBtn = document.getElementById('tab-btn-box');
-        var standardBtn = document.getElementById('tab-btn-standard');
+        var stdImpBtn = document.getElementById('tab-btn-std-imp');
+        var stdMetBtn = document.getElementById('tab-btn-std-met');
 
         itemContent.style.display = target === 'item' ? 'block' : 'none';
         boxContent.style.display = target === 'box' ? 'block' : 'none';
-        standardContent.style.display = target === 'standard' ? 'block' : 'none';
+        stdImpContent.style.display = target === 'std-imp' ? 'block' : 'none';
+        stdMetContent.style.display = target === 'std-met' ? 'block' : 'none';
 
         itemBtn.className = target === 'item' ? 'tab-btn active' : 'tab-btn';
         boxBtn.className = target === 'box' ? 'tab-btn active' : 'tab-btn';
-        standardBtn.className = target === 'standard' ? 'tab-btn active' : 'tab-btn';
+        stdImpBtn.className = target === 'std-imp' ? 'tab-btn active' : 'tab-btn';
+        stdMetBtn.className = target === 'std-met' ? 'tab-btn active' : 'tab-btn';
     }
 
     function addNewItemRow() {
@@ -701,6 +797,8 @@
             '<input type="number" step="0.1" id="box' + currentId + '_w" value="40.0">' +
             '<input type="number" step="0.1" id="box' + currentId + '_h" value="30.0">' +
             '</div></td>' +
+            '<td class="calc-cell" id="box' + currentId + '_out_in">—</td>' +
+            '<td class="calc-cell" id="box' + currentId + '_out_lbs">—</td>' +
             '<td><input type="number" step="0.1" id="box' + currentId + '_emp" value="1.0" class="table-input"></td>' +
             '<td><select id="box' + currentId + '_match" class="table-select"></select></td>' +
             '<td><input type="number" id="box' + currentId + '_pcs" value="10" class="table-input"></td>' +
@@ -892,6 +990,11 @@
         }
 
         var total_act_wt = emp + (unit_wt * pcs);
+        var l_in = l * 0.393700787;
+        var w_in = w * 0.393700787;
+        var h_in = h * 0.393700787;
+        var total_act_wt_lbs = total_act_wt * 2.20462262;
+
         var vol_m3 = (l * w * h) / 1000000;
         var vol_wt_kg = (l * w * h) / 6000;
         var bill_wt_kg = Math.max(total_act_wt, vol_wt_kg);
@@ -934,6 +1037,8 @@
             statusEl.innerHTML = "✅ 完全合规";
         }
 
+        document.getElementById(boxPrefix + '_out_in').innerHTML = l_in.toFixed(2) + '×' + w_in.toFixed(2) + '×' + h_in.toFixed(2);
+        document.getElementById(boxPrefix + '_out_lbs').innerHTML = total_act_wt_lbs.toFixed(2);
         document.getElementById(boxPrefix + '_out_actwt').innerHTML = total_act_wt.toFixed(2) + ' kg';
         document.getElementById(boxPrefix + '_out_m3').innerHTML = vol_m3.toFixed(4);
         document.getElementById(boxPrefix + '_out_volwt').innerHTML = vol_wt_kg.toFixed(2) + ' kg';
