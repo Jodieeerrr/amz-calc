@@ -62,7 +62,7 @@
         .config-left {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 10px;
         }
 
         .info-tag {
@@ -93,6 +93,47 @@
             text-align: center;
             font-weight: bold;
             color: var(--primary-color);
+        }
+
+        /* 换算器样式 */
+        .converter-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 14px;
+            color: #262626;
+            font-weight: 500;
+        }
+
+        .converter-group {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: #ffffff;
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px dashed var(--accent-color);
+        }
+
+        .converter-group input {
+            width: 65px;
+            padding: 4px 6px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            text-align: center;
+            font-size: 13px;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .converter-group input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        .converter-group span.icon {
+            color: #8c8c8c;
+            margin: 0 2px;
         }
 
         .tab-box {
@@ -178,32 +219,29 @@
             min-width: 1550px;
         }
 
-        /* 基础判断表格列宽控制（6列） */
         table.criteria-table {
             min-width: 1200px;
             table-layout: fixed;
             width: 100%;
         }
-        table.criteria-table th:nth-child(1) { width: 18%; } /* 商品尺寸分段 */
-        table.criteria-table th:nth-child(2) { width: 16%; } /* 发货重量¹ */
-        table.criteria-table th:nth-child(3) { width: 22%; } /* 最长边 */
-        table.criteria-table th:nth-child(4) { width: 11%; } /* 次长边 */
-        table.criteria-table th:nth-child(5) { width: 11%; } /* 最短边 */
-        table.criteria-table th:nth-child(6) { width: 12%; } /* 长度加围长 */
+        table.criteria-table th:nth-child(1) { width: 18%; } 
+        table.criteria-table th:nth-child(2) { width: 16%; } 
+        table.criteria-table th:nth-child(3) { width: 22%; } 
+        table.criteria-table th:nth-child(4) { width: 11%; } 
+        table.criteria-table th:nth-child(5) { width: 11%; } 
+        table.criteria-table th:nth-child(6) { width: 12%; } 
 
-        /* 配送费率表列宽控制（5列） */
         table.ref-table {
             min-width: 1200px;
             table-layout: fixed;
             width: 100%;
         }
-        table.ref-table th:nth-child(1) { width: 15%; } /* 尺寸分段 */
-        table.ref-table th:nth-child(2) { width: 13%; } /* 发货重量 */
-        table.ref-table th:nth-child(3) { width: 24%; } /* <10美元 */
-        table.ref-table th:nth-child(4) { width: 24%; } /* 10-50美元 */
-        table.ref-table th:nth-child(5) { width: 24%; } /* >50美元 */
+        table.ref-table th:nth-child(1) { width: 15%; } 
+        table.ref-table th:nth-child(2) { width: 13%; } 
+        table.ref-table th:nth-child(3) { width: 24%; } 
+        table.ref-table th:nth-child(4) { width: 24%; } 
+        table.ref-table th:nth-child(5) { width: 24%; } 
 
-        /* 统一标准选项卡中两个参考表格的内边距与行高 */
         table.criteria-table th, table.criteria-table td,
         table.ref-table th, table.ref-table td {
             padding: 12px 14px;
@@ -293,6 +331,19 @@
                 <span>⚙️ 测量误差常数调节：</span>
                 <span>📏 长度/尺寸安全缓冲：<input type="number" step="0.1" id="cfg_len_buffer" value="1.5"> cm</span>
                 <span>⚖️ 外箱重量安全缓冲：<input type="number" step="0.05" id="cfg_wt_buffer" value="0.50"> kg</span>
+            </div>
+            <div class="converter-controls">
+                <span>🔄 快捷单位换算：</span>
+                <div class="converter-group">
+                    <input type="number" id="conv_cm" placeholder="厘米"> cm 
+                    <span class="icon">⇌</span> 
+                    <input type="number" id="conv_in" placeholder="英寸"> in
+                </div>
+                <div class="converter-group">
+                    <input type="number" id="conv_kg" placeholder="千克"> kg 
+                    <span class="icon">⇌</span> 
+                    <input type="number" id="conv_lbs" placeholder="磅"> lbs
+                </div>
             </div>
         </div>
         <button class="btn-calc" onclick="doGlobalCalculate()"> 点击计算</button>
@@ -523,12 +574,12 @@
                 <tbody>
                     <tr><td>小号标准尺寸</td><td>不超过2盎司</td><td>2.43</td><td>3.32</td><td>3.58</td></tr>
                     <tr><td>小号标准尺寸</td><td>2至4盎司</td><td>2.49</td><td>3.42</td><td>3.68</td></tr>
-                    <tr><td>小号标准尺寸</td><td>4至6盎司</td><td>2.56</td><td>3.45</td><td>3.71</td></tr>
-                    <tr><td>小号标准尺寸</td><td>6至8盎司</td><td>2.66</td><td>3.54</td><td>3.8</td></tr>
-                    <tr><td>小号标准尺寸</td><td>8至10盎司</td><td>2.77</td><td>3.68</td><td>3.94</td></tr>
-                    <tr><td>小号标准尺寸</td><td>10至12盎司</td><td>2.82</td><td>3.78</td><td>4.04</td></tr>
-                    <tr><td>小号标准尺寸</td><td>12至14盎司</td><td>2.92</td><td>3.91</td><td>4.17</td></tr>
-                    <tr><td>小号标准尺寸</td><td>14至16盎司</td><td>2.95</td><td>3.96</td><td>4.22</td></tr>
+                    <tr><td>小号标准尺寸</td><td>4至6</td><td>2.56</td><td>3.45</td><td>3.71</td></tr>
+                    <tr><td>小号标准尺寸</td><td>6至8</td><td>2.66</td><td>3.54</td><td>3.8</td></tr>
+                    <tr><td>小号标准尺寸</td><td>8至10</td><td>2.77</td><td>3.68</td><td>3.94</td></tr>
+                    <tr><td>小号标准尺寸</td><td>10至12</td><td>2.82</td><td>3.78</td><td>4.04</td></tr>
+                    <tr><td>小号标准尺寸</td><td>12至14</td><td>2.92</td><td>3.91</td><td>4.17</td></tr>
+                    <tr><td>小号标准尺寸</td><td>14至16</td><td>2.95</td><td>3.96</td><td>4.22</td></tr>
                     <tr><td>大号标准尺寸</td><td>不超过 4 盎司</td><td>$2.91</td><td>$3.73</td><td>$3.99</td></tr>
                     <tr><td>大号标准尺寸</td><td>4 至 8 盎司 (不含 4)</td><td>$3.13</td><td>$3.95</td><td>$4.21</td></tr>
                     <tr><td>大号标准尺寸</td><td>8 至 12 盎司 (不含 8)</td><td>$3.38</td><td>$4.20</td><td>$4.46</td></tr>
@@ -559,6 +610,31 @@
     var maxItemId = 3;
     var activeBoxIds = [1, 2];
     var maxBoxId = 2;
+
+    // 初始化双向单位换算器事件绑定
+    function initConverter() {
+        var cm = document.getElementById('conv_cm');
+        var inc = document.getElementById('conv_in');
+        var kg = document.getElementById('conv_kg');
+        var lbs = document.getElementById('conv_lbs');
+
+        cm.addEventListener('input', function() {
+            var val = parseFloat(this.value);
+            inc.value = isNaN(val) ? '' : (val * 0.393700787).toFixed(2);
+        });
+        inc.addEventListener('input', function() {
+            var val = parseFloat(this.value);
+            cm.value = isNaN(val) ? '' : (val * 2.54).toFixed(2);
+        });
+        kg.addEventListener('input', function() {
+            var val = parseFloat(this.value);
+            lbs.value = isNaN(val) ? '' : (val * 2.20462262).toFixed(2);
+        });
+        lbs.addEventListener('input', function() {
+            var val = parseFloat(this.value);
+            kg.value = isNaN(val) ? '' : (val * 0.45359237).toFixed(2);
+        });
+    }
 
     function switchTab(target) {
         var itemContent = document.getElementById('tab-content-item');
@@ -884,6 +960,7 @@
     }
 
     window.onload = function() {
+        initConverter(); // 挂载换算器监听
         doGlobalCalculate();
     };
 </script>
